@@ -1,6 +1,5 @@
 let currentMode = 1;
-let count = 0;  // 횟수 카운트 변수
-let previousAngle = 0;  // 이전 각도 값 (변경된 각도 여부 추적)
+let count = 0;
 let stage = null;
 
 function setMode(mode) {
@@ -19,89 +18,72 @@ function calculateAngle(a, b, c) {
 
 function onResults(results) {
   const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
   const video = document.getElementById("webcam");
 
+  // 비디오 해상도 기준으로 canvas 사이즈 동기화
+  if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  }
+
+  const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-
+  
+  // ✅ 영상도 수동 반전해서 캔버스에 그림
   ctx.save();
+  ctx.translate(canvas.width, 0);
   ctx.scale(-1, 1);
-  ctx.translate(-canvas.width, 0);
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
   ctx.restore();
-
+  
   if (!results.poseLandmarks) return;
 
-
-  // ✅ 랜드마크 좌표도 좌우 반전
-  const flippedLandmarks = results.poseLandmarks.map(p => ({
+  // ✅ 랜드마크 좌표 좌우 반전 (거울 반영)
+  const lm = results.poseLandmarks.map(p => ({
     ...p,
-    x: 1.0 - p.x  // 좌우 반전
+    x: 1.0 - p.x
   }));
 
-  drawConnectors(ctx, flippedLandmarks, POSE_CONNECTIONS,
-    { color: "#00FF00", lineWidth: 3 });
-  drawLandmarks(ctx, flippedLandmarks, {
-      color: "#FF0000",
-      lineWidth: 1,    // 선 얇게
-      radius: 2        // 점 작게 (기본은 5 정도)
-   });
+  // 랜드마크 및 연결선 그리기
+  drawConnectors(ctx, lm, POSE_CONNECTIONS, { color: "#00FF00", lineWidth: 3 });
+  drawLandmarks(ctx, lm, { color: "#FF0000", lineWidth: 1, radius: 2 });
 
-  
-  const lm = flippedLandmarks; // 좌우 반전된 랜드마크 기준
+  // 분석 + 카운트
   ctx.font = "20px sans-serif";
   ctx.fillStyle = "yellow";
 
   let angle;
 
   if (currentMode === 1) {
-    angle = calculateAngle(lm[24], lm[26], lm[28]); // 오른쪽: HIP, KNEE, ANKLE
+    angle = calculateAngle(lm[24], lm[26], lm[28]); // 스쿼트
     ctx.fillText(`스쿼트 각도: ${Math.round(angle)}°`, 30, 30);
-
     if (angle < 95) ctx.fillText("GREAT!", 30, 60);
-
     if (angle < 95) stage = "down";
-    if (angle > 120 && stage === "down") {
-      count++;
-      stage = "up";
-    }
+    if (angle > 120 && stage === "down") { count++; stage = "up"; }
   }
 
   else if (currentMode === 2) {
-    angle = calculateAngle(lm[12], lm[24], lm[26]); // SHOULDER, HIP, KNEE
+    angle = calculateAngle(lm[12], lm[24], lm[26]); // 런지
     ctx.fillText(`런지 각도: ${Math.round(angle)}°`, 30, 30);
-
     if (angle < 97) ctx.fillText("GREAT!", 30, 60);
-
     if (angle < 97) stage = "down";
-    if (angle > 160 && stage === "down") {
-      count++;
-      stage = "up";
-    }
-
-  } 
-  
-  else if (currentMode === 3) {
-    angle = calculateAngle(lm[12], lm[11], lm[13]); // SHOULDER, ELBOW, WRIST
-    ctx.fillText(`사이드암 각도: ${Math.round(angle)}°`, 30, 30);
-
-    if (angle > 140) ctx.fillText("GREAT!", 30, 60);
-
-    if (angle < 115) stage = "down";
-    if (angle > 140 && stage === "down") {
-      count++;
-      stage = "up";
-    }
-
+    if (angle > 160 && stage === "down") { count++; stage = "up"; }
   }
 
-  //ctx.fillText(message, 30, 60);
-  document.getElementById("count-display").textContent = `현재 횟수: ${count}`;  // 횟수 업데이트
+  else if (currentMode === 3) {
+    angle = calculateAngle(lm[12], lm[11], lm[13]); // 사이드암
+    ctx.fillText(`사이드암 각도: ${Math.round(angle)}°`, 30, 30);
+    if (angle > 140) ctx.fillText("GREAT!", 30, 60);
+    if (angle < 115) stage = "down";
+    if (angle > 140 && stage === "down") { count++; stage = "up"; }
+  }
+
+  document.getElementById("count-display").textContent = `현재 횟수: ${count}`;
 }
 
 document.getElementById("start-button").addEventListener("click", async () => {
   const video = document.getElementById("webcam");
+
   const stream = await navigator.mediaDevices.getUserMedia({
     video: {
       width: { ideal: 1920 },
@@ -110,6 +92,8 @@ document.getElementById("start-button").addEventListener("click", async () => {
     }
   });
   video.srcObject = stream;
+
+  // canvas 크기 동기화
   video.onloadedmetadata = () => {
     const canvas = document.getElementById("canvas");
     canvas.width = video.videoWidth;
@@ -134,7 +118,6 @@ document.getElementById("start-button").addEventListener("click", async () => {
     await pose.send({ image: video });
     requestAnimationFrame(renderFrame);
   }
-  
-  renderFrame(); // 루프 시작
 
+  renderFrame(); // 루프 시작
 });
