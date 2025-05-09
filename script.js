@@ -19,33 +19,46 @@ function calculateAngle(a, b, c) {
 
 function onResults(results) {
   const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
   const video = document.getElementById("webcam");
 
-  // 🔧 영상 해상도에 맞춰 canvas 해상도 조정 (1번만 수행)
-  if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-  }
-
-  const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
+  ctx.save();
+  ctx.scale(-1, 1);
+  ctx.translate(-canvas.width, 0);
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
   if (!results.poseLandmarks) return;
 
-  drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS,
+  //const excludedLandmarks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // 얼굴 랜드마크의 인덱스 (LEFT_EYE, RIGHT_EYE, NOSE 등)
+
+  //const filteredLandmarks = results.poseLandmarks.filter((landmark, index) => {
+  //  return !excludedLandmarks.includes(index);  // 얼굴 랜드마크 제외
+  //});
+
+  // ✅ 랜드마크 좌표도 좌우 반전
+  const flippedLandmarks = results.poseLandmarks.map(p => ({
+    ...p,
+    x: 1.0 - p.x  // 좌우 반전
+  }));
+
+  drawConnectors(ctx, flippedLandmarks, POSE_CONNECTIONS,
     { color: "#00FF00", lineWidth: 3 });
-  drawLandmarks(ctx, results.poseLandmarks, {
+  drawLandmarks(ctx, flippedLandmarks, {
       color: "#FF0000",
       lineWidth: 1,    // 선 얇게
       radius: 2        // 점 작게 (기본은 5 정도)
    });
 
-  const lm = results.poseLandmarks;
+  
+  const lm = flippedLandmarks; // 좌우 반전된 랜드마크 기준
   ctx.font = "20px sans-serif";
   ctx.fillStyle = "yellow";
 
-  let angle, message;
+  let angle;
 
   if (currentMode === 1) {
     angle = calculateAngle(lm[24], lm[26], lm[28]); // 오른쪽: HIP, KNEE, ANKLE
@@ -94,13 +107,7 @@ function onResults(results) {
 
 document.getElementById("start-button").addEventListener("click", async () => {
   const video = document.getElementById("webcam");
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: {
-      width: { ideal: 1920 },
-      height: { ideal: 1080 },
-      facingMode: "user"
-    }
-  });
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
   video.srcObject = stream;
 
   const pose = new Pose({
@@ -117,13 +124,13 @@ document.getElementById("start-button").addEventListener("click", async () => {
 
   pose.onResults(onResults);
 
-  async function renderFrame() {
-    await pose.send({ image: video });
-    requestAnimationFrame(renderFrame);
-  }
-  
-  renderFrame(); // 루프 시작
-  
+  const camera = new Camera(video, {
+    onFrame: async () => {
+      await pose.send({ image: video });
+    },
+    width: 640,
+    height: 480
+  });
 
   camera.start();
 });
