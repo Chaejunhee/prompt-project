@@ -117,13 +117,13 @@ document.getElementById("start-button").addEventListener("click", async () => {
 
   pose.onResults(onResults);
 
-  const camera = new Camera(video, {
-    onFrame: async () => {
-      await pose.send({ image: video });
-    },
-    width: 1920,
-    height: 1080
-  });
+  async function renderFrame() {
+    await pose.send({ image: video });
+    requestAnimationFrame(renderFrame);
+  }
+  
+  renderFrame(); // 루프 시작
+  
 
   camera.start();
 });
