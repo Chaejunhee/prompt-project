@@ -86,7 +86,13 @@ function onResults(results) {
 
 document.getElementById("start-button").addEventListener("click", async () => {
   const video = document.getElementById("webcam");
-  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: {
+      width: { ideal: 1920 },
+      height: { ideal: 1080 },
+      facingMode: "user"
+    }
+  });
   video.srcObject = stream;
 
   const pose = new Pose({
