@@ -19,6 +19,14 @@ function calculateAngle(a, b, c) {
 
 function onResults(results) {
   const canvas = document.getElementById("canvas");
+  const video = document.getElementById("webcam");
+
+  // 🔧 영상 해상도에 맞춰 canvas 해상도 조정 (1번만 수행)
+  if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  }
+
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
