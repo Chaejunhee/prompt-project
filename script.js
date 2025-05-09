@@ -33,11 +33,6 @@ function onResults(results) {
 
   if (!results.poseLandmarks) return;
 
-  //const excludedLandmarks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // 얼굴 랜드마크의 인덱스 (LEFT_EYE, RIGHT_EYE, NOSE 등)
-
-  //const filteredLandmarks = results.poseLandmarks.filter((landmark, index) => {
-  //  return !excludedLandmarks.includes(index);  // 얼굴 랜드마크 제외
-  //});
 
   // ✅ 랜드마크 좌표도 좌우 반전
   const flippedLandmarks = results.poseLandmarks.map(p => ({
@@ -107,8 +102,19 @@ function onResults(results) {
 
 document.getElementById("start-button").addEventListener("click", async () => {
   const video = document.getElementById("webcam");
-  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: {
+      width: { ideal: 1920 },
+      height: { ideal: 1080 },
+      facingMode: "user"
+    }
+  });
   video.srcObject = stream;
+  video.onloadedmetadata = () => {
+    const canvas = document.getElementById("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  };
 
   const pose = new Pose({
     locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
@@ -131,5 +137,4 @@ document.getElementById("start-button").addEventListener("click", async () => {
   
   renderFrame(); // 루프 시작
 
-  camera.start();
 });
