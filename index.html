@@ -5,6 +5,19 @@
   <title>운동 자세 분석기</title>
   <style>
     body { margin: 0; font-family: sans-serif; text-align: center; }
+
+    #controls {
+      margin: 30px;
+      z-index: 20;
+    }
+
+    /* 추가된 횟수 표시 영역 스타일 */
+    #count-display {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 10px;
+      color: rgba(0, 33, 182, 0.723);
+    }
     #video-container {
       position: relative;
       width: 640px;
@@ -18,7 +31,8 @@
       height: 480px;
     }
     #canvas { z-index: 10; pointer-events: none; }
-    #controls { margin-top: 500px; z-index: 20; }
+
+    
     #mode-text { font-size: 24px; font-weight: bold; margin-top: 20px; }
   </style>
 </head>
@@ -27,17 +41,20 @@
   <h1>운동 자세 분석기</h1>
   <div id="mode-text">스쿼트 모드</div>
 
-  <div id="video-container">
-    <video id="webcam" autoplay muted playsinline></video>
-    <canvas id="canvas"></canvas>
-  </div>
-
   <div id="controls">
+    <div id="count-display">현재 횟수: 0</div> <!-- 횟수 표시할 div -->
     <button id="start-button">웹캠 시작</button>
     <button onclick="setMode(1)">스쿼트</button>
     <button onclick="setMode(2)">런지</button>
     <button onclick="setMode(3)">사이드암</button>
   </div>
+
+  <div id="video-container">
+    <video id="webcam" autoplay muted playsinline></video>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  
 
   <!-- Mediapipe 및 스크립트 로딩 -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>

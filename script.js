@@ -1,7 +1,12 @@
 let currentMode = 1;
+let count = 0;  // 횟수 카운트 변수
+let previousAngle = 0;  // 이전 각도 값 (변경된 각도 여부 추적)
+let stage = null;
 
 function setMode(mode) {
   currentMode = mode;
+  count = 0;
+  stage = null;
   document.getElementById("mode-text").textContent =
     ["", "스쿼트 모드", "런지 모드", "사이드암 모드"][mode];
 }
@@ -32,19 +37,51 @@ function onResults(results) {
   ctx.font = "20px sans-serif";
   ctx.fillStyle = "yellow";
 
+  let angle, message;
+
   if (currentMode === 1) {
-    const angle = calculateAngle(lm[24], lm[26], lm[28]); // 오른쪽: HIP, KNEE, ANKLE
+    angle = calculateAngle(lm[24], lm[26], lm[28]); // 오른쪽: HIP, KNEE, ANKLE
     ctx.fillText(`스쿼트 각도: ${Math.round(angle)}°`, 30, 30);
-    if (angle < 80) ctx.fillText("무릎을 더 굽히세요!", 30, 60);
-  } else if (currentMode === 2) {
-    const angle = calculateAngle(lm[12], lm[24], lm[26]); // SHOULDER, HIP, KNEE
-    ctx.fillText(`런지 각도: ${Math.round(angle)}°`, 30, 30);
-    if (angle < 90) ctx.fillText("허리를 세우세요!", 30, 60);
-  } else if (currentMode === 3) {
-    const angle = calculateAngle(lm[11], lm[13], lm[15]); // SHOULDER, ELBOW, WRIST
-    ctx.fillText(`사이드암 각도: ${Math.round(angle)}°`, 30, 30);
-    if (angle < 45) ctx.fillText("팔을 더 올리세요!", 30, 60);
+
+    if (angle < 95) ctx.fillText("GREAT!", 30, 60);
+
+    if (angle < 95) stage = "down";
+    if (angle > 120 && stage === "down") {
+      count++;
+      stage = "up";
+    }
   }
+
+  else if (currentMode === 2) {
+    angle = calculateAngle(lm[12], lm[24], lm[26]); // SHOULDER, HIP, KNEE
+    ctx.fillText(`런지 각도: ${Math.round(angle)}°`, 30, 30);
+
+    if (angle < 97) ctx.fillText("GREAT!", 30, 60);
+
+    if (angle < 97) stage = "down";
+    if (angle > 160 && stage === "down") {
+      count++;
+      stage = "up";
+    }
+
+  } 
+  
+  else if (currentMode === 3) {
+    angle = calculateAngle(lm[12], lm[11], lm[13]); // SHOULDER, ELBOW, WRIST
+    ctx.fillText(`사이드암 각도: ${Math.round(angle)}°`, 30, 30);
+
+    if (angle > 140) ctx.fillText("GREAT!", 30, 60);
+
+    if (angle < 115) stage = "down";
+    if (angle > 140 && stage === "down") {
+      count++;
+      stage = "up";
+    }
+
+  }
+
+  //ctx.fillText(message, 30, 60);
+  document.getElementById("count-display").textContent = `현재 횟수: ${count}`;  // 횟수 업데이트
 }
 
 document.getElementById("start-button").addEventListener("click", async () => {
