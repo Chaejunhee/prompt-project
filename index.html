@@ -104,14 +104,19 @@
       overflow: hidden;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
-
-    #webcam, #canvas {
+    #webcam {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
+      top: 0;
+      left: 0;
+      z-index: 1;
     }
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      pointer-events: none;
+}
   </style>
 </head>
 <body>
