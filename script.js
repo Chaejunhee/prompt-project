@@ -16,7 +16,7 @@ function setMode(mode) {
   upFrameCount = 0;
 
   document.getElementById("mode-text").textContent =
-    ["스쿼트 모드", "암컬 모드", "사이드암 모드", "크로스 토터치 모드","킥백 모드"][mode];
+    ["","스쿼트 모드", "암컬 모드", "사이드암 모드", "크로스 토터치 모드","킥백 모드"][mode];
 }
 
 function calculateAngle(a, b, c) {
@@ -211,6 +211,9 @@ function onResults(results) {
       ctx.fillText("굿!", 30, 60);
     }
   }
+  // 모드별 angle 계산 완료 후...
+
+  
 
   //ctx.fillText(message, 30, 60);
   document.getElementById("count-display").textContent = `현재 횟수: ${count}`;  // 횟수 업데이트
