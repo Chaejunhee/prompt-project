@@ -3,29 +3,140 @@
 <head>
   <meta charset="UTF-8" />
   <title>운동 자세 분석기</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      height: 100vh;
+    }
+
+    /* 왼쪽 사이드바 */
+    .sidebar {
+      width: 220px;
+      background-color: #fff;
+      border-right: 1px solid #ddd;
+      padding: 20px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: #333;
+    }
+
+    .exercise-list button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .exercise-list button:hover {
+      background-color: #0056b3;
+    }
+
+    /* 오른쪽 콘텐츠 영역 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    #mode-text {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    #count-display {
+      font-size: 22px;
+      font-weight: bold;
+      color: #0021b6;
+      margin-bottom: 10px;
+    }
+
+    #start-button {
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    #start-button:hover {
+      background-color: #1e7e34;
+    }
+
+    #video-container {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    #webcam, #canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+  </style>
 </head>
-<body style="margin: 0; font-family: sans-serif; display: flex; flex-direction: column; align-items: center;">
-
-  <h1>운동 자세 분석기</h1>
-  <div id="mode-text" style="font-size: 24px; font-weight: bold; margin-top: 20px;">스쿼트 모드</div>
-
-  <div id="controls" style="margin: 30px;">
-    <div id="count-display" style="font-size: 24px; font-weight: bold; margin: 10px; color: rgba(0, 33, 182, 0.723);">
-      현재 횟수: 0
+<body>
+  <!-- 좌측 운동 목록 -->
+  <div class="sidebar">
+    <h2>운동 목록</h2>
+    <div class="exercise-list">
+      <button onclick="setMode(1)">스쿼트</button>
+      <button onclick="setMode(2)">니업</button>
+      <button onclick="setMode(3)">사이드암</button>
+      <button onclick="setMode(4)">암컬</button>
     </div>
-    <button id="start-button">웹캠 시작</button>
-    <button onclick="setMode(1)">스쿼트</button>
-    <button onclick="setMode(2)">런지</button>
-    <button onclick="setMode(3)">사이드암</button>
   </div>
-  <div id="video-container"
-    style="position: relative; width: 100%; max-width: 960px; aspect-ratio: 16 / 9; margin: 0 auto;">
-  <video id="webcam"
-      autoplay muted playsinline
-      style="position: absolute; width: 100%; height: 100%; object-fit: cover;">
-  </video>
-  <canvas id="canvas"
-       style="position: absolute; width: 100%; height: 100%; pointer-events: none;"></canvas>
+
+  <!-- 우측 메인 콘텐츠 -->
+  <div class="main-content">
+    <h1>운동 자세 분석기</h1>
+    <div id="mode-text">스쿼트 모드</div>
+    <div id="count-display">현재 횟수: 0</div>
+    <button id="start-button">웹캠 시작</button>
+
+    <div id="video-container">
+      <video id="webcam" autoplay muted playsinline></video>
+      <canvas id="canvas"></canvas>
+    </div>
   </div>
 
   <!-- Mediapipe & JS -->
