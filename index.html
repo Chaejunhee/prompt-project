@@ -9,7 +9,48 @@
       font-family: 'Segoe UI', sans-serif;
       background: #f5f7fa;
       display: flex;
+      flex-direction: column;
       height: 100vh;
+    }
+
+    /* 상단 헤더 */
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #333;
+    }
+
+    #start-button {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    #start-button:hover {
+      background-color: #1e7e34;
+    }
+
+    .content-area {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
     }
 
     /* 왼쪽 사이드바 */
@@ -54,95 +95,82 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       padding: 20px;
     }
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    }
-
     #mode-text {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       color: #444;
     }
 
     #count-display {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
       color: #0021b6;
-      margin-bottom: 10px;
-    }
-
-    #start-button {
-      padding: 10px 20px;
       margin-bottom: 20px;
-      font-size: 16px;
-      font-weight: bold;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    #start-button:hover {
-      background-color: #1e7e34;
     }
 
     #video-container {
       position: relative;
       width: 100%;
-      max-width: 960px;
-      aspect-ratio: 16 / 9;
+      max-width: 720px;
+      aspect-ratio: 9 / 16;
       background: #000;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
+
     #webcam {
       position: absolute;
       top: 0;
       left: 0;
       z-index: 1;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
     }
+
     #canvas {
       position: absolute;
       top: 0;
       left: 0;
       z-index: 2;
       pointer-events: none;
-}
+    }
   </style>
 </head>
 <body>
-  <!-- 좌측 운동 목록 -->
-  <div class="sidebar">
-    <h2>운동 목록</h2>
-    <div class="exercise-list">
-      <button onclick="setMode(1)">스쿼트</button>
-      <button onclick="setMode(2)">암컬</button>
-      <button onclick="setMode(3)">사이드암</button>
-      <button onclick="setMode(4)">크로스 토터치</button>
-      <button onclick="setMode(5)">킥백</button>
-    </div>
+  <!-- 상단 제목 및 시작 버튼 -->
+  <div class="header">
+    <h1>운동 자세 분석기</h1>
+    <button id="start-button">웹캠 시작</button>
   </div>
 
-  <!-- 우측 메인 콘텐츠 -->
-  <div class="main-content">
-    <h1>운동 자세 분석기</h1>
-    <div id="mode-text">스쿼트 모드</div>
-    <div id="count-display">현재 횟수: 0</div>
-    <button id="start-button">웹캠 시작</button>
+  <div class="content-area">
+    <!-- 좌측 운동 목록 -->
+    <div class="sidebar">
+      <h2>운동 목록</h2>
+      <div class="exercise-list">
+        <button onclick="setMode(1)">스쿼트</button>
+        <button onclick="setMode(2)">암컬</button>
+        <button onclick="setMode(3)">사이드암</button>
+        <button onclick="setMode(4)">크로스 토터치</button>
+        <button onclick="setMode(5)">킥백</button>
+      </div>
+    </div>
 
-    <div id="video-container">
-      <video id="webcam" autoplay muted playsinline></video>
-      <canvas id="canvas"></canvas>
+    <!-- 우측 메인 콘텐츠 -->
+    <div class="main-content">
+      <div id="mode-text">스쿼트 모드</div>
+      <div id="count-display">현재 횟수: 0</div>
+      <div id="video-container">
+        <video id="webcam" autoplay muted playsinline></video>
+        <canvas id="canvas"></canvas>
+      </div>
     </div>
   </div>
 
