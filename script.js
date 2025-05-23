@@ -16,7 +16,7 @@ function setMode(mode) {
   upFrameCount = 0;
 
   document.getElementById("mode-text").textContent =
-    ["", "스쿼트 모드", "암컬 모드", "사이드암 모드", "크로스 토터치 모드"][mode];
+    ["스쿼트 모드", "암컬 모드", "사이드암 모드", "크로스 토터치 모드","킥백 모드"][mode];
 }
 
 function calculateAngle(a, b, c) {
