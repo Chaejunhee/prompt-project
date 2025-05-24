@@ -17,11 +17,13 @@
     .header {
       width: 100%;
       display: flex;
+      justify-content: space-between;
       align-items: center;
       padding: 10px 20px;
       background-color: #fff;
       border-bottom: 1px solid #ddd;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      
     }
 
     .header h1 {
@@ -31,8 +33,6 @@
     }
 
     #start-button {
-      margin-left: auto; /* 왼쪽으로 살짝 이동 */
-      margin-right: 20px; /* 오른쪽 끝에 너무 붙지 않게 */
       padding: 8px 16px;
       font-size: 14px;
       font-weight: bold;
@@ -42,6 +42,7 @@
       border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.2s ease;
+      margin-right: 30px;
     }
 
     #start-button:hover {
@@ -54,6 +55,7 @@
       overflow: hidden;
     }
 
+    /* 왼쪽 사이드바 */
     .sidebar {
       width: 220px;
       background-color: #fff;
@@ -89,6 +91,7 @@
       background-color: #0056b3;
     }
 
+    /* 오른쪽 콘텐츠 영역 */
     .main-content {
       flex: 1;
       display: flex;
@@ -124,15 +127,16 @@
     }
 
     #webcam {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      transform: scaleX(-1); /* 좌우반전 */
-      z-index: 1;
-    }
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scaleX(-1); /* 좌우반전 */
+  z-index: 1;
+}
+
 
     #canvas {
       position: absolute;
@@ -167,6 +171,25 @@
     <div class="main-content">
       <div id="mode-text">스쿼트 모드</div>
       <div id="count-display">현재 횟수: 0</div>
+
+      <!-- 모드 지정과 카운트 시작버튼 -->
+      <div style="margin-bottom: 20px;">
+        <label>
+          <input type="radio" name="count-mode" value="infinite" checked onchange="setCountMode('infinite')"> 무한 모드
+        </label>
+        <label style="margin-left: 20px;">
+          <input type="radio" name="count-mode" value="limited" onchange="setCountMode('limited')"> 카운트 모드
+        </label>
+        <input type="number" id="target-count" placeholder="목표 횟수" min="1" style="margin-left: 10px; width: 80px;" />
+        <button id="count-start-button" style="margin-left: 10px; padding: 4px 16px; font-weight: bold;">
+          카운트 시작
+        </button>
+      </div>
+      
+      <!-- SUCCESS 메시지 출력 박스 -->
+      <div id="success-box" style="font-size: 24px; font-weight: bold; color: green; margin-top: 12px;"></div>
+      
+      
       <div id="video-container">
         <video id="webcam" autoplay muted playsinline></video>
         <canvas id="canvas"></canvas>
